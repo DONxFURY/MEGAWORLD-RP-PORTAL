@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SERVER PORTAL</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+    }
+    body {
+      min-height: 100vh; overflow: hidden;
+      display: flex; justify-content: center; align-items: center;
+      background-image: var(--background-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    :root {
+      --background-image: url('https://images.unsplash.com/photo-1527443224154-9f2958cfd16e'); /* Editable background image URL */
+      --core-bg-color: radial-gradient(circle, #5865f2, #363fad); /* Editable core circle color */
+      --core-shadow-color: #5865f2;
+    }
+    .container {
+      position: relative;
+      width: 100%; max-width: 1000px; height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .grid-bg {
+      position: absolute; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(0,150,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,150,255,0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 30s linear infinite;
+      opacity: 0.4; z-index: -1;
+    }
+    .core-interface {
+      position: relative;
+      width: 600px; height: 600px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .core {
+      width: 140px; height: 140px;
+      border-radius: 50%; background: var(--core-bg-color);
+      box-shadow: 0 0 80px var(--core-shadow-color), inset 0 0 20px #fff;
+      cursor: pointer; z-index: 10;
+      display: flex; justify-content: center; align-items: center;
+      animation: float 4s ease-in-out infinite, pulseShadow 2s ease-in-out infinite;
+    }
+    .core-text {
+      color: #fff; font-size: 18px; font-weight: bold;
+      text-shadow: 0 0 20px var(--core-shadow-color);
+      animation: flicker 2s infinite alternate;
+    }
+    .radial-menu {
+      position: absolute;
+      width: 100%; height: 100%;
+      pointer-events: none; transform: scale(0);
+      transition: transform 0.5s ease;
+    }
+    .radial-menu.active {
+      transform: scale(1);
+      pointer-events: all;
+    }
+    .server-icon {
+      position: absolute;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      transform: scale(0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .server-icon.active {
+      animation: popIn 0.5s forwards;
+    }
+    .server-icon img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 50%;
+    }
+    .status-indicator {
+      position: absolute; top: 5px; right: 5px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #4caf50; box-shadow: 0 0 5px #4caf50;
+    }
+    .status-indicator.offline {
+      background: #f44336; box-shadow: 0 0 5px #f44336;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes pulseShadow {
+      0%, 100% { box-shadow: 0 0 60px var(--core-shadow-color); }
+      50% { box-shadow: 0 0 90px var(--core-shadow-color); }
+    }
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 50px 50px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="grid-bg"></div>
+    <div class="core-interface">
+      <div class="core" id="core">
+        <div class="core-text">ACTIVATE</div>
+      </div>
+      <div class="radial-menu" id="radialMenu"></div>
+    </div>
+  </div>
+  <script>
+    const backgroundImage = "url('https://64.media.tumblr.com/e85d4e1a60f19b2c62bb7a88a73eabc5/tumblr_o7vs1zNO341runoqyo2_540.gif')"; // Change this URL
+    document.documentElement.style.setProperty('--background-image', backgroundImage);
+
+    const coreColor = "radial-gradient(circle, #060270, #363fad)"; // Change core background color
+    const coreShadow = "#5865f2"; // Change core shadow color
+    document.documentElement.style.setProperty('--core-bg-color', coreColor);
+    document.documentElement.style.setProperty('--core-shadow-color', coreShadow);
+
+    const servers = [
+      { name: "MEGAWORLD RP", image: "https://cdn.discordapp.com/attachments/1381420113269493812/1390183937078464612/image.png?ex=6867552e&is=686603ae&hm=8638879a5c66eb6588523974781352886576634b01d6cdcaaac2a7ed83e0f61e&", online: true, link: "https://discord.gg/94vWCvgFmf", color: "#CC6CE7" },
+      { name: "KTS MAFIA", image: "https://i.postimg.cc/Xv7zP3Mx/image.png", online: true, link: "https://discord.gg/2", color: "#E4080A" },
+      { name: "Dev", image: "https://via.placeholder.com/90x90?text=DEV", online: false, link: "https://discord.gg/3", color: "#faa61a" },
+      { name: "Art", image: "https://via.placeholder.com/90x90?text=ART", online: true, link: "https://discord.gg/4", color: "#e91e63" },
+      { name: "Comms", image: "https://via.placeholder.com/90x90?text=COM", online: true, link: "https://discord.gg/5", color: "#7289da" },
+      { name: "Events", image: "https://via.placeholder.com/90x90?text=EVT", online: true, link: "https://discord.gg/6", color: "#ff9800" },
+    ];
+
+    const core = document.getElementById("core");
+    const radialMenu = document.getElementById("radialMenu");
+
+    core.addEventListener("click", () => {
+      radialMenu.classList.toggle("active");
+      if (radialMenu.classList.contains("active")) generateMenu();
+    });
+
+    function generateMenu() {
+      radialMenu.innerHTML = "";
+      const radius = 200;
+      const angleStep = (2 * Math.PI) / servers.length;
+      servers.forEach((server, i) => {
+        const angle = angleStep * i;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        const el = document.createElement("div");
+        el.className = "server-icon active";
+        el.style.left = `calc(50% + ${x}px - 45px)`;
+        el.style.top = `calc(50% + ${y}px - 45px)`;
+        el.style.border = `2px solid ${server.color}`;
+        el.style.boxShadow = `0 0 25px ${server.color}`;
+        el.innerHTML = `
+          <img src="${server.image}" alt="${server.name}" />
+          <div class="status-indicator ${server.online ? "" : "offline"}"></div>
+        `;
+        el.addEventListener("click", () => {
+          window.open(server.link, "_blank");
+        });
+        radialMenu.appendChild(el);
+      });
+    }
+  </script>
+</body>
+</html>
